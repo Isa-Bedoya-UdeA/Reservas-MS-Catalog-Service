@@ -33,6 +33,9 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <jjwt.version>0.12.5</jjwt.version>
         <lombok.version>1.18.34</lombok.version>
+        <sonar.projectKey>Isa-Bedoya-UdeA_Reservas-MS-Catalog-Service</sonar.projectKey>
+        <sonar.organization>isa-bedoya-udea</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <dependencies>
         <!-- Spring Boot Starters -->
