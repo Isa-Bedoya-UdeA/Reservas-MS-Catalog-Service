@@ -1,6 +1,6 @@
-package com.codefactory.reservasmscatalogservice.service.impl;
+package com.codefactory.reservasmscatalogservice.security.impl;
 
-import com.codefactory.reservasmscatalogservice.service.JwtService;
+import com.codefactory.reservasmscatalogservice.security.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

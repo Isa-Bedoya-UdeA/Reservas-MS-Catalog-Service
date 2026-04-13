@@ -26,9 +26,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Health check público
                         .requestMatchers("/api/", "/api/version").permitAll()
-                        // Endpoints de lectura pueden ser públicos (ajustar según necesidad)
-                        .requestMatchers("/api/categories").permitAll()
-                        .requestMatchers("/api/services/**").permitAll()
+                        // Category endpoints - GET públicos (cualquiera puede ver categorías)
+                        .requestMatchers("/api/catalog/categories").permitAll()
+                        .requestMatchers("/api/catalog/categories/{id}").permitAll()
+                        // Category endpoints de escritura - solo admin
+                        .requestMatchers("/api/catalog/categories/**").hasRole("ADMIN")
                         // Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 )

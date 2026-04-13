@@ -8,13 +8,15 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class AuthClientWrapper {
 
     private final AuthClient authClient;
 
-    public ExternalClientDTO getClientOrThrow(Long clientId) {
+    public ExternalClientDTO getClientOrThrow(UUID clientId) {
         try {
             var response = authClient.getClientById(clientId);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
@@ -28,7 +30,7 @@ public class AuthClientWrapper {
         }
     }
 
-    public ExternalProviderDTO getProviderOrThrow(Long providerId) {
+    public ExternalProviderDTO getProviderOrThrow(UUID providerId) {
         try {
             var response = authClient.getProviderById(providerId);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {

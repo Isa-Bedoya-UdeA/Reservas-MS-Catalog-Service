@@ -1,4 +1,4 @@
-package com.codefactory.reservasmscatalogservice.service;
+package com.codefactory.reservasmscatalogservice.security;
 
 import io.jsonwebtoken.Claims;
 import java.util.function.Function;

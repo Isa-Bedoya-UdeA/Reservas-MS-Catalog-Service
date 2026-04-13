@@ -33,6 +33,12 @@ jobs:
       #Run Tests
       - name: Run Tests
         run: mvn -B test
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
 
   #Sonar's Job
   sonar:
@@ -109,7 +115,7 @@ jobs:
           #Set artifact name
           name: artifact
           #From this path
-          path: target/reservas-ms-auth-service.jar
+          path: target/reservas-ms-catalog-service.jar
 
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v6

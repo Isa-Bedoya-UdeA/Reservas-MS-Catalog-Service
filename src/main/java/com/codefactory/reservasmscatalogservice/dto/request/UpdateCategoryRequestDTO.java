@@ -1,6 +1,5 @@
 package com.codefactory.reservasmscatalogservice.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,15 +10,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCategoryRequestDTO {
+public class UpdateCategoryRequestDTO {
 
-    @NotBlank(message = "El nombre de la categoría es obligatorio")
     @Size(max = 100, message = "El nombre no puede exceder los 100 caracteres")
     private String nombreCategoria;
 
     @Size(max = 500, message = "La descripción no puede exceder los 500 caracteres")
     private String descripcion;
-    
-    @Builder.Default
-    private Boolean activa = true;
+
+    private Boolean activa;
 }
