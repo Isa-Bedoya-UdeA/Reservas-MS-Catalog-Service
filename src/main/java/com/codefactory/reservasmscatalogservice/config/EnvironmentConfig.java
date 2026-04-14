@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 @Configuration
-public class EnvironmentConfiguration implements CommandLineRunner {
+public class EnvironmentConfig implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(EnvironmentConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentConfig.class);
 
     private final Environment env;
 
@@ -20,7 +20,7 @@ public class EnvironmentConfiguration implements CommandLineRunner {
     @Value("${spring.datasource.username:not-set}")
     private String dbUsername;
 
-    public EnvironmentConfiguration(Environment env) {
+    public EnvironmentConfig(Environment env) {
         this.env = env;
     }
 
