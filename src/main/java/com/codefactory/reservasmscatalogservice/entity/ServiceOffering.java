@@ -49,6 +49,10 @@ public class ServiceOffering {
     @Builder.Default
     private Boolean activo = true;
 
+    @Column(name = "capacidad_maxima", nullable = false)
+    @Builder.Default
+    private Integer capacidadMaxima = 1;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

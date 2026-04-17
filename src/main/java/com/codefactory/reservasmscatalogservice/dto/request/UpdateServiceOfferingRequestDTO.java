@@ -28,5 +28,8 @@ public class UpdateServiceOfferingRequestDTO {
     @Size(max = 500, message = "La descripción no puede exceder los 500 caracteres")
     private String descripcion;
 
+    @Min(value = 1, message = "La capacidad máxima debe ser al menos 1")
+    private Integer capacidadMaxima;
+
     private Boolean activo;
 }

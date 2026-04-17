@@ -22,6 +22,7 @@ public class ServiceOfferingResponseDTO {
     private BigDecimal precio;
     private String descripcion;
     private Boolean activo;
+    private Integer capacidadMaxima;
     private ExternalProviderDTO proveedorInfo;
     private LocalDateTime createdAt;
 }
