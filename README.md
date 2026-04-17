@@ -197,8 +197,9 @@ Reservas-MS-Catalog-Service/
 (Pendiente)
 
 ### Documentación de API (Swagger/OpenAPI)
-[docs/swagger.png]
-(Pendiente)
+![Swagger](docs/swagger.png)
+
+**Ruta de acceso:** http://localhost:8082/swagger-ui/index.html#/
 
 ### Variables de Entorno para Despliegue
 [docs/environment-variables.md]
