@@ -43,6 +43,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<CategoryResponseDTO> getActiveCategories() {
+        return categoryRepository.findByActivaTrue().stream()
+                .map(categoryMapper::toDto)
+                .toList();
+    }
+
+    @Override
     public CategoryResponseDTO getCategoryById(UUID id) {
         ServiceCategory category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));

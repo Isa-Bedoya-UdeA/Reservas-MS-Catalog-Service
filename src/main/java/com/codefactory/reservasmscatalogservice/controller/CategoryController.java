@@ -32,7 +32,7 @@ public class CategoryController {
     @GetMapping
     @Operation(
         summary = "Obtener todas las categorías",
-        description = "Retorna una lista con todas las categorías activas de servicios disponibles."
+        description = "Retorna una lista con todas las categorías de servicios (incluyendo inactivas)."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de categorías retornada exitosamente")
@@ -40,6 +40,19 @@ public class CategoryController {
     @SecurityRequirements
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @GetMapping("/active")
+    @Operation(
+        summary = "Obtener categorías activas",
+        description = "Retorna una lista con solo las categorías activas de servicios disponibles. Usado por proveedores para seleccionar categorías al crear servicios."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de categorías activas retornada exitosamente")
+    })
+    @SecurityRequirements
+    public ResponseEntity<List<CategoryResponseDTO>> getActiveCategories() {
+        return ResponseEntity.ok(categoryService.getActiveCategories());
     }
 
     @GetMapping("/{id}")

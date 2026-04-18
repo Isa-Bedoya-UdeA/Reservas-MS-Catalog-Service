@@ -48,13 +48,13 @@ Content-Type: application/json
 [
     {
         "id": "[UUID-CATEGORIA-1]",
-        "nombre": "Belleza",
+        "nombreCategoria": "Belleza",
         "descripcion": "Servicios de belleza y cuidado personal",
         "activo": true
     },
     {
         "id": "[UUID-CATEGORIA-2]",
-        "nombre": "Salud",
+        "nombreCategoria": "Salud",
         "descripcion": "Servicios de salud y bienestar",
         "activo": true
     }
@@ -77,7 +77,7 @@ Content-Type: application/json
 ```json
 {
     "id": "[UUID-CATEGORIA]",
-    "nombre": "Belleza",
+    "nombreCategoria": "Belleza",
     "descripcion": "Servicios de belleza y cuidado personal",
     "activo": true
 }
@@ -85,7 +85,38 @@ Content-Type: application/json
 
 ---
 
-### 3. Obtener Categoría No Existente (404)
+### 3. Obtener Categorías Activas (Público)
+
+**Nombre:** Get Active Categories - Success
+**URL:** `http://localhost:8082/api/catalog/categories/active`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+```
+**Código esperado:** 200 OK
+**Response esperado:**
+```json
+[
+    {
+        "id": "[UUID-CATEGORIA-1]",
+        "nombreCategoria": "Belleza",
+        "descripcion": "Servicios de belleza y cuidado personal",
+        "activo": true
+    },
+    {
+        "id": "[UUID-CATEGORIA-2]",
+        "nombreCategoria": "Salud",
+        "descripcion": "Servicios de salud y bienestar",
+        "activo": true
+    }
+]
+```
+**Nota:** Este endpoint retorna solo las categorías activas. Es usado por proveedores para seleccionar categorías al crear servicios.
+
+---
+
+### 4. Obtener Categoría No Existente (404)
 
 **Nombre:** Get Category by ID - Not Found
 **URL:** `http://localhost:8082/api/catalog/categories/00000000-0000-0000-0000-000000000000`
@@ -108,7 +139,7 @@ Content-Type: application/json
 
 ---
 
-### 4. Obtener Categoría con ID Inválido (400)
+### 5. Obtener Categoría con ID Inválido (400)
 
 **Nombre:** Get Category by ID - Invalid UUID
 **URL:** `http://localhost:8082/api/catalog/categories/invalid-uuid`
@@ -130,7 +161,7 @@ Content-Type: application/json
 
 ---
 
-### 5. Crear Categoría (Requiere ROLE_ADMIN)
+### 6. Crear Categoría (Requiere ROLE_ADMIN)
 
 **Nombre:** Create Category - Success
 **URL:** `http://localhost:8082/api/catalog/categories`
@@ -143,7 +174,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 **Body:**
 ```json
 {
-    "nombre": "Deportes",
+    "nombreCategoria": "Deportes",
     "descripcion": "Servicios deportivos y fitness"
 }
 ```
@@ -152,7 +183,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 ```json
 {
     "id": "[UUID-NUEVA-CATEGORIA]",
-    "nombre": "Deportes",
+    "nombreCategoria": "Deportes",
     "descripcion": "Servicios deportivos y fitness",
     "activo": true
 }
@@ -161,7 +192,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ---
 
-### 6. Crear Categoría con Datos Inválidos (400)
+### 7. Crear Categoría con Datos Inválidos (400)
 
 **Nombre:** Create Category - Invalid Data
 **URL:** `http://localhost:8082/api/catalog/categories`
@@ -174,7 +205,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 **Body:**
 ```json
 {
-    "nombre": "  ",
+    "nombreCategoria": "  ",
     "descripcion": "abc"
 }
 ```
@@ -187,15 +218,14 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
     "error": "Validation Error",
     "message": "Errores de validación en los datos de entrada",
     "validationErrors": {
-        "nombre": "El nombre no puede estar vacío",
-        "descripcion": "La descripción debe tener al menos 10 caracteres"
+        "nombreCategoria": "El nombre de la categoría es obligatorio"
     }
 }
 ```
 
 ---
 
-### 7. Crear Categoría sin Autorización (401)
+### 8. Crear Categoría sin Autorización (401)
 
 **Nombre:** Create Category - Unauthorized
 **URL:** `http://localhost:8082/api/catalog/categories`
@@ -207,7 +237,7 @@ Content-Type: application/json
 **Body:**
 ```json
 {
-    "nombre": "Deportes",
+    "nombreCategoria": "Deportes",
     "descripcion": "Servicios deportivos y fitness"
 }
 ```
@@ -237,7 +267,7 @@ Authorization: Bearer [JWT_TOKEN_CLIENTE]
 **Body:**
 ```json
 {
-    "nombre": "Deportes",
+    "nombreCategoria": "Deportes",
     "descripcion": "Servicios deportivos y fitness"
 }
 ```
@@ -254,7 +284,7 @@ Authorization: Bearer [JWT_TOKEN_CLIENTE]
 
 ---
 
-### 9. Actualizar Categoría (Requiere ROLE_ADMIN)
+### 10. Actualizar Categoría (Requiere ROLE_ADMIN)
 
 **Nombre:** Update Category - Success
 **URL:** `http://localhost:8082/api/catalog/categories/[UUID-CATEGORIA]`
@@ -267,7 +297,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 **Body:**
 ```json
 {
-    "nombre": "Belleza y Cuidado Personal",
+    "nombreCategoria": "Belleza y Cuidado Personal",
     "descripcion": "Servicios profesionales de belleza y cuidado personal"
 }
 ```
@@ -276,7 +306,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 ```json
 {
     "id": "[UUID-CATEGORIA]",
-    "nombre": "Belleza y Cuidado Personal",
+    "nombreCategoria": "Belleza y Cuidado Personal",
     "descripcion": "Servicios profesionales de belleza y cuidado personal",
     "activo": true
 }
@@ -284,7 +314,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ---
 
-### 10. Actualizar Categoría No Existente (404)
+### 11. Actualizar Categoría No Existente (404)
 
 **Nombre:** Update Category - Not Found
 **URL:** `http://localhost:8082/api/catalog/categories/00000000-0000-0000-0000-000000000000`
@@ -297,7 +327,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 **Body:**
 ```json
 {
-    "nombre": "Nombre Actualizado",
+    "nombreCategoria": "Nombre Actualizado",
     "descripcion": "Descripción actualizada"
 }
 ```
@@ -314,7 +344,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ---
 
-### 11. Desactivar Categoría (Requiere ROLE_ADMIN)
+### 12. Desactivar Categoría (Requiere ROLE_ADMIN)
 
 **Nombre:** Deactivate Category - Success
 **URL:** `http://localhost:8082/api/catalog/categories/[UUID-CATEGORIA]`
@@ -329,7 +359,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ---
 
-### 12. Desactivar Categoría No Existente (404)
+### 13. Desactivar Categoría No Existente (404)
 
 **Nombre:** Deactivate Category - Not Found
 **URL:** `http://localhost:8082/api/catalog/categories/00000000-0000-0000-0000-000000000000`
@@ -352,7 +382,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ---
 
-### 13. Activar Categoría (Requiere ROLE_ADMIN)
+### 14. Activar Categoría (Requiere ROLE_ADMIN)
 
 **Nombre:** Activate Category - Success
 **URL:** `http://localhost:8082/api/catalog/categories/[UUID-CATEGORIA]/activate`
@@ -367,7 +397,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ---
 
-### 14. Activar Categoría No Existente (404)
+### 15. Activar Categoría No Existente (404)
 
 **Nombre:** Activate Category - Not Found
 **URL:** `http://localhost:8082/api/catalog/categories/00000000-0000-0000-0000-000000000000/activate`
@@ -392,7 +422,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 
 ## Servicios Ofertados
 
-### 15. Crear Servicio Ofertado (Requiere ROLE_PROVEEDOR)
+### 16. Crear Servicio Ofertado (Requiere ROLE_PROVEEDOR)
 
 **Nombre:** Create Service Offering - Success
 **URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
@@ -429,7 +459,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ---
 
-### 16. Crear Servicio Ofertado con Datos Inválidos (400)
+### 17. Crear Servicio Ofertado con Datos Inválidos (400)
 
 **Nombre:** Create Service Offering - Invalid Data
 **URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
@@ -469,7 +499,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ---
 
-### 17. Crear Servicio Ofertado sin Autorización (401)
+### 18. Crear Servicio Ofertado sin Autorización (401)
 
 **Nombre:** Create Service Offering - Unauthorized
 **URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
@@ -501,7 +531,7 @@ Content-Type: application/json
 
 ---
 
-### 18. Crear Servicio Ofertado con Rol Incorrecto (403)
+### 19. Crear Servicio Ofertado con Rol Incorrecto (403)
 
 **Nombre:** Create Service Offering - Forbidden (Wrong Role)
 **URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
@@ -534,7 +564,7 @@ Authorization: Bearer [JWT_TOKEN_CLIENTE]
 
 ---
 
-### 19. Crear Servicio Ofertado con Capacidad Inválida (400)
+### 20. Crear Servicio Ofertado con Capacidad Inválida (400)
 
 **Nombre:** Create Service Offering - Invalid Capacity
 **URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
@@ -570,7 +600,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ---
 
-### 20. Crear Servicio Ofertado con Proveedor Incorrecto (403)
+### 21. Crear Servicio Ofertado con Proveedor Incorrecto (403)
 
 **Nombre:** Create Service Offering - Wrong Provider
 **URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-OTRO-PROVEEDOR]`
@@ -605,7 +635,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ## Health Check
 
-### 21. Health Check
+### 22. Health Check
 
 **Nombre:** Health Check - Success
 **URL:** `http://localhost:8082/api/`
@@ -620,7 +650,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ---
 
-### 22. Version Check
+### 23. Version Check
 
 **Nombre:** Version Check - Success
 **URL:** `http://localhost:8082/api/version`

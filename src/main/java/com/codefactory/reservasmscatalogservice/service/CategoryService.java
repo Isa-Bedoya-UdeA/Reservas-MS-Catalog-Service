@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface CategoryService {
     CategoryResponseDTO createCategory(CreateCategoryRequestDTO request);
     List<CategoryResponseDTO> getAllCategories();
+    List<CategoryResponseDTO> getActiveCategories();
     CategoryResponseDTO getCategoryById(UUID id);
     CategoryResponseDTO updateCategory(UUID id, UpdateCategoryRequestDTO request);
     void deactivateCategory(UUID id);

@@ -80,7 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             // Token inválido o expirado - se continúa sin autenticación
-            logger.debug("Token validation failed: {}", e.getMessage());
+            logger.error("Token validation failed: {}", e.getMessage(), e);
         }
 
         filterChain.doFilter(request, response);
