@@ -38,10 +38,11 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/configuration/**").permitAll()
-                        // Category endpoints - GET públicos (cualquiera puede ver categorías)
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/categories").permitAll()
+                        // Category endpoints - GET públicos (cualquiera puede ver categorías activas)
                         .requestMatchers(HttpMethod.GET, "/api/catalog/categories/active").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/catalog/categories/{id}").permitAll()
+                        // Category endpoint - todas las categorías (incluyendo inactivas) solo para admins
+                        .requestMatchers(HttpMethod.GET, "/api/catalog/categories").hasRole("ADMIN")
                         // Category endpoints de escritura - solo admin
                         .requestMatchers(HttpMethod.POST, "/api/catalog/categories").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/catalog/categories/{id}").hasRole("ADMIN")

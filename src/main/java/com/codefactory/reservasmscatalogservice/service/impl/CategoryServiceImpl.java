@@ -88,6 +88,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void deactivateCategory(UUID id) {
         ServiceCategory category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
+        if (!category.getActiva()) {
+            throw new BusinessException("La categoría ya está inactiva");
+        }
         category.setActiva(false);
         categoryRepository.save(category);
     }
@@ -97,6 +100,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void activateCategory(UUID id) {
         ServiceCategory category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
+        if (category.getActiva()) {
+            throw new BusinessException("La categoría ya está activa");
+        }
         category.setActiva(true);
         categoryRepository.save(category);
     }

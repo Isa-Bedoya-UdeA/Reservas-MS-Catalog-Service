@@ -154,7 +154,7 @@ Reservas-MS-Catalog-Service/
 - `GET /api/version`: Version Check - Retorna versión del servicio
 
 ### Categorías
-- `GET /api/catalog/categories`: Obtener todas las categorías (incluyendo inactivas) (público)
+- `GET /api/catalog/categories`: Obtener todas las categorías (incluyendo inactivas) (requiere ROLE_ADMIN)
 - `GET /api/catalog/categories/active`: Obtener solo categorías activas (público) - Usado por proveedores
 - `GET /api/catalog/categories/{id}`: Obtener categoría por ID (público)
 - `POST /api/catalog/categories`: Crear nueva categoría (requiere ROLE_ADMIN)

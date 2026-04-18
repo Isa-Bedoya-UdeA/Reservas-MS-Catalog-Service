@@ -33,7 +33,7 @@ El microservicio de Catálogo requiere autenticación JWT para operaciones que r
 
 ## Categorías
 
-### 1. Obtener Todas las Categorías (Público)
+### 1. Obtener Todas las Categorías (Requiere ROLE_ADMIN)
 
 **Nombre:** Get All Categories - Success
 **URL:** `http://localhost:8082/api/catalog/categories`
@@ -41,6 +41,7 @@ El microservicio de Catálogo requiere autenticación JWT para operaciones que r
 **Headers:**
 ```
 Content-Type: application/json
+Authorization: Bearer [JWT_TOKEN_ADMIN]
 ```
 **Código esperado:** 200 OK
 **Response esperado:**
