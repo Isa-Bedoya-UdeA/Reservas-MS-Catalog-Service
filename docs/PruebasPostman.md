@@ -426,7 +426,7 @@ Authorization: Bearer [JWT_TOKEN_ADMIN]
 ### 16. Crear Servicio Ofertado (Requiere ROLE_PROVEEDOR)
 
 **Nombre:** Create Service Offering - Success
-**URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
+**URL:** `http://localhost:8082/api/catalog/services`
 **Método:** POST
 **Headers:**
 ```
@@ -436,7 +436,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 **Body:**
 ```json
 {
-    "nombre": "Corte de Cabello",
+    "nombreServicio": "Corte de Cabello",
     "descripcion": "Corte de cabello profesional",
     "duracionMinutos": 30,
     "precio": 25000,
@@ -448,22 +448,23 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 ```json
 {
     "id": "[UUID-NUEVO-SERVICIO]",
-    "nombre": "Corte de Cabello",
+    "nombreServicio": "Corte de Cabello",
     "descripcion": "Corte de cabello profesional",
     "duracionMinutos": 30,
     "precio": 25000,
     "capacidadMaxima": 1,
-    "activo": true
+    "activo": true,
+    "idProveedor": "[UUID-PROVEEDOR]"
 }
 ```
-**Nota:** El `idProveedor` se pasa como query parameter y debe corresponder al proveedor autenticado.
+**Nota:** El `idProveedor` se obtiene automáticamente del JWT del proveedor autenticado.
 
 ---
 
-### 17. Crear Servicio Ofertado con Datos Inválidos (400)
+### 17. Crear Servicio Ofertado con Capacidad Ilimitada (Requiere ROLE_PROVEEDOR)
 
-**Nombre:** Create Service Offering - Invalid Data
-**URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
+**Nombre:** Create Service Offering - Unlimited Capacity
+**URL:** `http://localhost:8082/api/catalog/services`
 **Método:** POST
 **Headers:**
 ```
@@ -473,11 +474,49 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 **Body:**
 ```json
 {
-    "nombre": "  ",
+    "nombreServicio": "Clase de Yoga",
+    "descripcion": "Clase de yoga grupal",
+    "duracionMinutos": 60,
+    "precio": 15000,
+    "capacidadMaxima": 0
+}
+```
+**Código esperado:** 201 Created
+**Response esperado:**
+```json
+{
+    "id": "[UUID-NUEVO-SERVICIO]",
+    "nombreServicio": "Clase de Yoga",
+    "descripcion": "Clase de yoga grupal",
+    "duracionMinutos": 60,
+    "precio": 15000,
+    "capacidadMaxima": 0,
+    "activo": true,
+    "idProveedor": "[UUID-PROVEEDOR]"
+}
+```
+**Nota:** `capacidadMaxima = 0` representa capacidad ilimitada (sin límite).
+
+---
+
+### 18. Crear Servicio Ofertado con Datos Inválidos (400)
+
+**Nombre:** Create Service Offering - Invalid Data
+**URL:** `http://localhost:8082/api/catalog/services`
+**Método:** POST
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
+```
+**Body:**
+```json
+{
+    "nombreServicio": "  ",
     "descripcion": "abc",
     "duracionMinutos": -1,
     "precio": -100,
-    "capacidadMaxima": 0
+    "capacidadMaxima": -1
 }
 ```
 **Código esperado:** 400 Bad Request
@@ -489,21 +528,20 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
     "error": "Validation Error",
     "message": "Errores de validación en los datos de entrada",
     "validationErrors": {
-        "nombre": "El nombre no puede estar vacío",
-        "descripcion": "La descripción debe tener al menos 10 caracteres",
+        "nombreServicio": "El nombre del servicio es obligatorio",
         "duracionMinutos": "La duración debe ser mayor a 0",
-        "precio": "El precio debe ser mayor a 0",
-        "capacidadMaxima": "La capacidad máxima debe ser al menos 1"
+        "precio": "El precio no puede ser negativo",
+        "capacidadMaxima": "La capacidad máxima debe ser al menos 0 (0 = sin límite)"
     }
 }
 ```
 
 ---
 
-### 18. Crear Servicio Ofertado sin Autorización (401)
+### 19. Crear Servicio Ofertado sin Autorización (401)
 
 **Nombre:** Create Service Offering - Unauthorized
-**URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
+**URL:** `http://localhost:8082/api/catalog/services`
 **Método:** POST
 **Headers:**
 ```
@@ -512,7 +550,7 @@ Content-Type: application/json
 **Body:**
 ```json
 {
-    "nombre": "Corte de Cabello",
+    "nombreServicio": "Corte de Cabello",
     "descripcion": "Corte de cabello profesional",
     "duracionMinutos": 30,
     "precio": 25000,
@@ -532,10 +570,10 @@ Content-Type: application/json
 
 ---
 
-### 19. Crear Servicio Ofertado con Rol Incorrecto (403)
+### 20. Crear Servicio Ofertado con Rol Incorrecto (403)
 
 **Nombre:** Create Service Offering - Forbidden (Wrong Role)
-**URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
+**URL:** `http://localhost:8082/api/catalog/services`
 **Método:** POST
 **Headers:**
 ```
@@ -545,7 +583,7 @@ Authorization: Bearer [JWT_TOKEN_CLIENTE]
 **Body:**
 ```json
 {
-    "nombre": "Corte de Cabello",
+    "nombreServicio": "Corte de Cabello",
     "descripcion": "Corte de cabello profesional",
     "duracionMinutos": 30,
     "precio": 25000,
@@ -565,11 +603,11 @@ Authorization: Bearer [JWT_TOKEN_CLIENTE]
 
 ---
 
-### 20. Crear Servicio Ofertado con Capacidad Inválida (400)
+### 21. Actualizar Servicio Ofertado (Requiere ROLE_PROVEEDOR)
 
-**Nombre:** Create Service Offering - Invalid Capacity
-**URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-PROVEEDOR]`
-**Método:** POST
+**Nombre:** Update Service Offering - Success
+**URL:** `http://localhost:8082/api/catalog/services/[UUID-SERVICIO]`
+**Método:** PUT
 **Headers:**
 ```
 Content-Type: application/json
@@ -578,34 +616,33 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 **Body:**
 ```json
 {
-    "nombre": "Corte de Cabello",
-    "descripcion": "Corte de cabello profesional",
-    "duracionMinutos": 30,
-    "precio": 25000,
-    "capacidadMaxima": 0
+    "nombreServicio": "Corte de Cabello Premium",
+    "precio": 30000
 }
 ```
-**Código esperado:** 400 Bad Request
+**Código esperado:** 200 OK
 **Response esperado:**
 ```json
 {
-    "timestamp": "2026-04-16T12:00:00",
-    "status": 400,
-    "error": "Validation Error",
-    "message": "Errores de validación en los datos de entrada",
-    "validationErrors": {
-        "capacidadMaxima": "La capacidad máxima debe ser al menos 1"
-    }
+    "id": "[UUID-SERVICIO]",
+    "nombreServicio": "Corte de Cabello Premium",
+    "descripcion": "Corte de cabello profesional",
+    "duracionMinutos": 30,
+    "precio": 30000,
+    "capacidadMaxima": 1,
+    "activo": true,
+    "idProveedor": "[UUID-PROVEEDOR]"
 }
 ```
+**Nota:** Solo el proveedor creador del servicio puede actualizarlo.
 
 ---
 
-### 21. Crear Servicio Ofertado con Proveedor Incorrecto (403)
+### 22. Actualizar Servicio Ofertado de Otro Proveedor (403)
 
-**Nombre:** Create Service Offering - Wrong Provider
-**URL:** `http://localhost:8082/api/catalog/services?idProveedor=[UUID-OTRO-PROVEEDOR]`
-**Método:** POST
+**Nombre:** Update Service Offering - Forbidden (Not Owner)
+**URL:** `http://localhost:8082/api/catalog/services/[UUID-SERVICIO-OTRO-PROVEEDOR]`
+**Método:** PUT
 **Headers:**
 ```
 Content-Type: application/json
@@ -614,11 +651,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 **Body:**
 ```json
 {
-    "nombre": "Corte de Cabello",
-    "descripcion": "Corte de cabello profesional",
-    "duracionMinutos": 30,
-    "precio": 25000,
-    "capacidadMaxima": 1
+    "precio": 30000
 }
 ```
 **Código esperado:** 403 Forbidden
@@ -628,7 +661,199 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
     "timestamp": "2026-04-16T12:00:00",
     "status": 403,
     "error": "Forbidden",
-    "message": "No puedes crear servicios para otro proveedor"
+    "message": "No tiene permiso para modificar este servicio. Solo el proveedor creador puede modificarlo."
+}
+```
+
+---
+
+### 23. Desactivar Servicio Ofertado (Soft Delete) (Requiere ROLE_PROVEEDOR)
+
+**Nombre:** Deactivate Service Offering - Success
+**URL:** `http://localhost:8082/api/catalog/services/[UUID-SERVICIO]`
+**Método:** DELETE
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
+```
+**Código esperado:** 204 No Content
+**Response esperado:** (vacío)
+
+---
+
+### 24. Desactivar Servicio Ya Inactivo (409)
+
+**Nombre:** Deactivate Service Offering - Already Inactive
+**URL:** `http://localhost:8082/api/catalog/services/[UUID-SERVICIO-INACTIVO]`
+**Método:** DELETE
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
+```
+**Código esperado:** 409 Conflict
+**Response esperado:**
+```json
+{
+    "timestamp": "2026-04-16T12:00:00",
+    "status": 409,
+    "error": "Conflict",
+    "message": "El servicio ya está inactivo con id: [UUID-SERVICIO-INACTIVO]"
+}
+```
+
+---
+
+### 25. Eliminar Servicio Permanentemente (Hard Delete) (Requiere ROLE_ADMIN)
+
+**Nombre:** Permanently Delete Service Offering - Success
+**URL:** `http://localhost:8082/api/catalog/services/[UUID-SERVICIO]/permanent`
+**Método:** DELETE
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer [JWT_TOKEN_ADMIN]
+```
+**Código esperado:** 204 No Content
+**Response esperado:** (vacío)
+
+---
+
+### 26. Listar Servicios del Proveedor (Requiere ROLE_PROVEEDOR)
+
+**Nombre:** Get Services by Provider - Success
+**URL:** `http://localhost:8082/api/catalog/services/provider`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
+```
+**Código esperado:** 200 OK
+**Response esperado:**
+```json
+[
+    {
+        "id": "[UUID-SERVICIO-1]",
+        "nombreServicio": "Corte de Cabello",
+        "descripcion": "Corte de cabello profesional",
+        "duracionMinutos": 30,
+        "precio": 25000,
+        "capacidadMaxima": 1,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR]"
+    },
+    {
+        "id": "[UUID-SERVICIO-2]",
+        "nombreServicio": "Manicura",
+        "descripcion": "Manicura profesional",
+        "duracionMinutos": 45,
+        "precio": 20000,
+        "capacidadMaxima": 2,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR]"
+    }
+]
+```
+
+---
+
+### 27. Listar Todos los Servicios Activos (Público)
+
+**Nombre:** Get All Active Services - Success
+**URL:** `http://localhost:8082/api/catalog/services/active`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+```
+**Código esperado:** 200 OK
+**Response esperado:**
+```json
+[
+    {
+        "id": "[UUID-SERVICIO-1]",
+        "nombreServicio": "Corte de Cabello",
+        "descripcion": "Corte de cabello profesional",
+        "duracionMinutos": 30,
+        "precio": 25000,
+        "capacidadMaxima": 1,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR-1]"
+    },
+    {
+        "id": "[UUID-SERVICIO-2]",
+        "nombreServicio": "Masaje",
+        "descripcion": "Masaje relajante",
+        "duracionMinutos": 60,
+        "precio": 50000,
+        "capacidadMaxima": 1,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR-2]"
+    }
+]
+```
+**Nota:** Este endpoint es público y es usado por clientes para ver servicios disponibles.
+
+---
+
+### 28. Listar Servicios Activos por Categoría (Público)
+
+**Nombre:** Get Active Services by Category - Success
+**URL:** `http://localhost:8082/api/catalog/services/active/category/[UUID-CATEGORIA]`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+```
+**Código esperado:** 200 OK
+**Response esperado:**
+```json
+[
+    {
+        "id": "[UUID-SERVICIO-1]",
+        "nombreServicio": "Corte de Cabello",
+        "descripcion": "Corte de cabello profesional",
+        "duracionMinutos": 30,
+        "precio": 25000,
+        "capacidadMaxima": 1,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR-1]"
+    },
+    {
+        "id": "[UUID-SERVICIO-2]",
+        "nombreServicio": "Manicura",
+        "descripcion": "Manicura profesional",
+        "duracionMinutos": 45,
+        "precio": 20000,
+        "capacidadMaxima": 2,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR-2]"
+    }
+]
+```
+**Nota:** Este endpoint retorna solo servicios activos de proveedores que pertenecen a la categoría especificada.
+
+---
+
+### 29. Listar Servicios Activos por Categoría Inactiva (404)
+
+**Nombre:** Get Active Services by Category - Inactive Category
+**URL:** `http://localhost:8082/api/catalog/services/active/category/[UUID-CATEGORIA-INACTIVA]`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+```
+**Código esperado:** 409 Conflict
+**Response esperado:**
+```json
+{
+    "timestamp": "2026-04-16T12:00:00",
+    "status": 409,
+    "error": "Conflict",
+    "message": "La categoría con id [UUID-CATEGORIA-INACTIVA] está inactiva"
 }
 ```
 
@@ -636,7 +861,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ## Health Check
 
-### 22. Health Check
+### 30. Health Check
 
 **Nombre:** Health Check - Success
 **URL:** `http://localhost:8082/api/`
@@ -651,7 +876,7 @@ Authorization: Bearer [JWT_TOKEN_PROVEEDOR]
 
 ---
 
-### 23. Version Check
+### 31. Version Check
 
 **Nombre:** Version Check - Success
 **URL:** `http://localhost:8082/api/version`

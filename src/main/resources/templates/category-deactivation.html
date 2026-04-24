@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categoría Desactivada - <span th:text="${appName}"></span></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4a90e2;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${appName}">Plataforma de Reservas</h1>
+        </div>
+        <div class="content">
+            <h2>Estimado/a <span th:text="${nombreComercial}">Proveedor</span>,</h2>
+            
+            <p>Le informamos que la categoría de servicio <strong>"<span th:text="${nombreCategory}">Categoría</span>"</strong> ha sido desactivada por los administradores de la plataforma.</p>
+            
+            <div class="highlight">
+                <p><strong>¿Qué significa esto?</strong></p>
+                <p>Sus servicios asociados a esta categoría ya no estarán visibles para los clientes en la plataforma. Los clientes no podrán realizar nuevas reservas para estos servicios.</p>
+            </div>
+            
+            <h3>Acciones recomendadas:</h3>
+            <ul>
+                <li>Puede comunicarse con el soporte de la plataforma para obtener más información sobre la desactivación.</li>
+                <li>Si desea continuar ofreciendo servicios, puede cambiar la categoría de sus servicios a una categoría activa disponible.</li>
+                <li>Para gestionar sus servicios, ingrese a su panel de proveedor en la plataforma.</li>
+            </ul>
+            
+            <p style="text-align: center;">
+                <a th:href="${frontendUrl}" class="button">Ir a la Plataforma</a>
+            </p>
+            
+            <p>Si tiene alguna pregunta o necesita asistencia, no dude en contactarnos.</p>
+            
+            <div class="footer">
+                <p>Este es un mensaje automático, por favor no responda a este correo.</p>
+                <p>&copy; 2026 <span th:text="${appName}">Plataforma de Reservas</span>. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

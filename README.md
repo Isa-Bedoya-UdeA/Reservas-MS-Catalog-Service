@@ -163,7 +163,17 @@ Reservas-MS-Catalog-Service/
 - `PATCH /api/catalog/categories/{id}/activate`: Activar categoría (requiere ROLE_ADMIN)
 
 ### Servicios Ofertados
-- `POST /api/catalog/services`: Crear servicio ofertado (requiere ROLE_PROVEEDOR)
+- `POST /api/catalog/services`: Crear servicio ofertado (requiere ROLE_PROVEEDOR) - El idProveedor se obtiene del JWT
+- `PUT /api/catalog/services/{id}`: Actualizar servicio existente (requiere ROLE_PROVEEDOR) - Solo el proveedor creador puede modificar
+- `DELETE /api/catalog/services/{id}`: Desactivar servicio (soft delete) (requiere ROLE_PROVEEDOR) - Solo el proveedor creador puede desactivar
+- `PATCH /api/catalog/services/{id}/disable`: Desactivar servicio (alternativo) (requiere ROLE_PROVEEDOR)
+- `DELETE /api/catalog/services/{id}/permanent`: Eliminar servicio permanentemente (hard delete) (requiere ROLE_ADMIN)
+- `GET /api/catalog/services/provider`: Listar todos los servicios del proveedor autenticado (requiere ROLE_PROVEEDOR)
+- `GET /api/catalog/services/active`: Listar todos los servicios activos (público) - Usado por clientes
+- `GET /api/catalog/services/active/category/{idCategoria}`: Listar servicios activos por categoría (público) - Usado por clientes
+
+### Notificaciones por Email
+- Cuando una categoría es desactivada por un administrador, se envía automáticamente un correo electrónico a todos los proveedores que pertenecen a esa categoría informándoles que sus servicios ya no estarán visibles para los clientes.
 
 ## Relaciones entre Entidades
 

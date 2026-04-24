@@ -1,27 +1,39 @@
 package com.codefactory.reservasmscatalogservice.service.impl;
 
+import com.codefactory.reservasmscatalogservice.client.AuthClient;
+import com.codefactory.reservasmscatalogservice.dto.external.ExternalProviderDTO;
 import com.codefactory.reservasmscatalogservice.dto.request.CreateCategoryRequestDTO;
 import com.codefactory.reservasmscatalogservice.dto.request.UpdateCategoryRequestDTO;
 import com.codefactory.reservasmscatalogservice.dto.response.CategoryResponseDTO;
 import com.codefactory.reservasmscatalogservice.entity.ServiceCategory;
+import com.codefactory.reservasmscatalogservice.entity.ServiceOffering;
 import com.codefactory.reservasmscatalogservice.exception.BusinessException;
 import com.codefactory.reservasmscatalogservice.exception.ResourceNotFoundException;
 import com.codefactory.reservasmscatalogservice.mapper.CategoryMapper;
 import com.codefactory.reservasmscatalogservice.repository.CategoryRepository;
+import com.codefactory.reservasmscatalogservice.repository.ServiceOfferingRepository;
 import com.codefactory.reservasmscatalogservice.service.CategoryService;
+import com.codefactory.reservasmscatalogservice.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final EmailService emailService;
+    private final AuthClient authClient;
+    private final ServiceOfferingRepository serviceOfferingRepository;
 
     @Override
     @Transactional
@@ -93,6 +105,41 @@ public class CategoryServiceImpl implements CategoryService {
         }
         category.setActiva(false);
         categoryRepository.save(category);
+
+        // Notify all providers who belong to this category
+        notifyProvidersAboutCategoryDeactivation(id, category.getNombreCategoria());
+    }
+
+    private void notifyProvidersAboutCategoryDeactivation(UUID categoryId, String categoryName) {
+        // Get all services to find providers in this category
+        List<ServiceOffering> services = serviceOfferingRepository.findByActivoTrue();
+        Set<UUID> notifiedProviders = new HashSet<>();
+
+        for (ServiceOffering service : services) {
+            UUID providerId = service.getIdProveedor();
+            if (notifiedProviders.contains(providerId)) {
+                continue; // Already notified this provider
+            }
+
+            try {
+                var providerResponse = authClient.getProviderById(providerId);
+                if (providerResponse != null && providerResponse.getBody() != null) {
+                    ExternalProviderDTO provider = providerResponse.getBody();
+                    if (categoryId.equals(provider.getIdCategoria())) {
+                        // Send email notification
+                        emailService.sendCategoryDeactivationEmail(
+                                provider.getEmail(),
+                                provider.getNombreComercial(),
+                                categoryName
+                        );
+                        notifiedProviders.add(providerId);
+                        log.info("Sent category deactivation email to provider: {}", provider.getNombreComercial());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to notify provider {} about category deactivation", providerId, e);
+            }
+        }
     }
 
     @Override

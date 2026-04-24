@@ -34,6 +34,6 @@ public class CreateServiceOfferingRequestDTO {
     private String descripcion;
 
     @NotNull(message = "La capacidad máxima es obligatoria")
-    @Min(value = 1, message = "La capacidad máxima debe ser al menos 1")
+    @Min(value = 0, message = "La capacidad máxima debe ser al menos 0 (0 = sin límite)")
     private Integer capacidadMaxima;
 }

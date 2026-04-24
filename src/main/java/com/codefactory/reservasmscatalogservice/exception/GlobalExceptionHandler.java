@@ -91,6 +91,70 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ServiceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleServiceNotFoundException(
+            ServiceNotFoundException ex, HttpServletRequest request) {
+        logger.warn("Service not found: {}", ex.getMessage());
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ServiceAlreadyInactiveException.class)
+    public ResponseEntity<ErrorResponseDTO> handleServiceAlreadyInactiveException(
+            ServiceAlreadyInactiveException ex, HttpServletRequest request) {
+        logger.warn("Service already inactive: {}", ex.getMessage());
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CategoryInactiveException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCategoryInactiveException(
+            CategoryInactiveException ex, HttpServletRequest request) {
+        logger.warn("Category inactive: {}", ex.getMessage());
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ProviderMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handleProviderMismatchException(
+            ProviderMismatchException ex, HttpServletRequest request) {
+        logger.warn("Provider mismatch: {}", ex.getMessage());
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(ExternalServiceException.class)
     public ResponseEntity<ErrorResponseDTO> handleExternalServiceException(
             ExternalServiceException ex, HttpServletRequest request) {
