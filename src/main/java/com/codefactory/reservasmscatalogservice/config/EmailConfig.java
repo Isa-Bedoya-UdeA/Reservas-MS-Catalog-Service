@@ -1,6 +1,7 @@
 package com.codefactory.reservasmscatalogservice.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,8 +15,10 @@ import java.util.Properties;
 /**
  * Configuration class for email sending.
  * Configures JavaMailSender for SMTP and Thymeleaf for HTML email templates.
+ * Only loads if email.username is configured.
  */
 @Configuration
+@ConditionalOnProperty(name = "email.username")
 public class EmailConfig {
 
     @Value("${email.host}")

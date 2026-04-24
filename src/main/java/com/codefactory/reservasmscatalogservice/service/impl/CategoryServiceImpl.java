@@ -16,6 +16,7 @@ import com.codefactory.reservasmscatalogservice.service.CategoryService;
 import com.codefactory.reservasmscatalogservice.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final EmailService emailService;
     private final AuthClient authClient;
     private final ServiceOfferingRepository serviceOfferingRepository;
+
+    @Autowired(required = false)
+    private EmailService emailService;
 
     @Override
     @Transactional
@@ -111,6 +114,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void notifyProvidersAboutCategoryDeactivation(UUID categoryId, String categoryName) {
+        if (emailService == null) {
+            log.warn("EmailService not configured, skipping provider notifications for category deactivation");
+            return;
+        }
+
         // Get all services to find providers in this category
         List<ServiceOffering> services = serviceOfferingRepository.findByActivoTrue();
         Set<UUID> notifiedProviders = new HashSet<>();

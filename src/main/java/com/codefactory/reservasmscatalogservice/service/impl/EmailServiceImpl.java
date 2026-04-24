@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.thymeleaf.context.Context;
  * Sends category deactivation emails using JavaMailSender and Thymeleaf templates.
  */
 @Service
+@ConditionalOnBean(name = "javaMailSender")
 @RequiredArgsConstructor
 @Slf4j
 public class EmailServiceImpl implements EmailService {
