@@ -15,22 +15,22 @@ import java.util.Properties;
 /**
  * Configuration class for email sending.
  * Configures JavaMailSender for SMTP and Thymeleaf for HTML email templates.
- * Only loads if email.username is configured.
+ * Loads by default unless email.enabled is explicitly set to false.
  */
 @Configuration
-@ConditionalOnProperty(name = "email.username")
+@ConditionalOnProperty(name = "email.enabled", havingValue = "true", matchIfMissing = true)
 public class EmailConfig {
 
-    @Value("${email.host}")
+    @Value("${email.host:smtp.gmail.com}")
     private String emailHost;
 
-    @Value("${email.port}")
+    @Value("${email.port:587}")
     private int emailPort;
 
-    @Value("${email.username}")
+    @Value("${email.username:}")
     private String emailUsername;
 
-    @Value("${email.password}")
+    @Value("${email.password:}")
     private String emailPassword;
 
     @Value("${email.smtp.auth:true}")

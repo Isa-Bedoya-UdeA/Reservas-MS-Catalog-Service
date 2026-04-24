@@ -25,13 +25,13 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
 
-    @Value("${platform.name}")
+    @Value("${platform.name:Plataforma de Reservas}")
     private String appName;
 
-    @Value("${email.username}")
+    @Value("${email.username:}")
     private String emailUsername;
 
-    @Value("${frontend.url}")
+    @Value("${frontend.url:http://localhost:3000}")
     private String frontendUrl;
 
     @Override
