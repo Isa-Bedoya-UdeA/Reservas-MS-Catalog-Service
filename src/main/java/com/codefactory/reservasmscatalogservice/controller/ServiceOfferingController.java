@@ -5,7 +5,6 @@ import com.codefactory.reservasmscatalogservice.dto.request.UpdateServiceOfferin
 import com.codefactory.reservasmscatalogservice.dto.response.ServiceOfferingResponseDTO;
 import com.codefactory.reservasmscatalogservice.service.ServiceOfferingService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,8 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,9 +42,10 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "404", description = "Proveedor no encontrado")
     })
     public ResponseEntity<ServiceOfferingResponseDTO> createServiceOffering(
-            @Valid @RequestBody CreateServiceOfferingRequestDTO request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        UUID idProveedor = UUID.fromString(userDetails.getUsername());
+            @Valid @RequestBody CreateServiceOfferingRequestDTO request) {
+        // Get userId from SecurityContext (set by JwtAuthenticationFilter)
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID idProveedor = UUID.fromString(userIdStr);
         return new ResponseEntity<>(serviceOfferingService.createServiceOffering(request, idProveedor),
                 HttpStatus.CREATED);
     }
@@ -65,9 +64,9 @@ public class ServiceOfferingController {
     })
     public ResponseEntity<ServiceOfferingResponseDTO> updateServiceOffering(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateServiceOfferingRequestDTO request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        UUID idProveedor = UUID.fromString(userDetails.getUsername());
+            @Valid @RequestBody UpdateServiceOfferingRequestDTO request) {
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID idProveedor = UUID.fromString(userIdStr);
         return ResponseEntity.ok(serviceOfferingService.updateServiceOffering(id, request, idProveedor));
     }
 
@@ -84,9 +83,9 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "409", description = "El servicio ya está inactivo")
     })
     public ResponseEntity<Void> deleteServiceOffering(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        UUID idProveedor = UUID.fromString(userDetails.getUsername());
+            @PathVariable UUID id) {
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID idProveedor = UUID.fromString(userIdStr);
         serviceOfferingService.deleteServiceOffering(id, idProveedor);
         return ResponseEntity.noContent().build();
     }
@@ -104,9 +103,9 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "409", description = "El servicio ya está inactivo")
     })
     public ResponseEntity<Void> disableServiceOffering(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        UUID idProveedor = UUID.fromString(userDetails.getUsername());
+            @PathVariable UUID id) {
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID idProveedor = UUID.fromString(userIdStr);
         serviceOfferingService.deleteServiceOffering(id, idProveedor);
         return ResponseEntity.noContent().build();
     }
@@ -137,9 +136,9 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "401", description = "No autenticado"),
         @ApiResponse(responseCode = "403", description = "No tiene rol de PROVEEDOR")
     })
-    public ResponseEntity<List<ServiceOfferingResponseDTO>> getServicesByProvider(
-            @AuthenticationPrincipal UserDetails userDetails) {
-        UUID idProveedor = UUID.fromString(userDetails.getUsername());
+    public ResponseEntity<List<ServiceOfferingResponseDTO>> getServicesByProvider() {
+        String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
+        UUID idProveedor = UUID.fromString(userIdStr);
         return ResponseEntity.ok(serviceOfferingService.getServicesByProvider(idProveedor, idProveedor));
     }
 
@@ -169,5 +168,20 @@ public class ServiceOfferingController {
     public ResponseEntity<List<ServiceOfferingResponseDTO>> getActiveServicesByCategory(
             @PathVariable UUID idCategoria) {
         return ResponseEntity.ok(serviceOfferingService.getActiveServicesByCategory(idCategoria));
+    }
+
+    @GetMapping("/active/provider/{idProveedor}")
+    @Operation(
+        summary = "Listar servicios activos por proveedor",
+        description = "Retorna todos los servicios activos de un proveedor específico. Público para clientes."
+    )
+    @SecurityRequirements
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de servicios activos retornada exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Proveedor no encontrado")
+    })
+    public ResponseEntity<List<ServiceOfferingResponseDTO>> getActiveServicesByProvider(
+            @PathVariable UUID idProveedor) {
+        return ResponseEntity.ok(serviceOfferingService.getActiveServicesByProvider(idProveedor));
     }
 }

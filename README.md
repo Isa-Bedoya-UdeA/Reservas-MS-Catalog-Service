@@ -171,6 +171,7 @@ Reservas-MS-Catalog-Service/
 - `GET /api/catalog/services/provider`: Listar todos los servicios del proveedor autenticado (requiere ROLE_PROVEEDOR)
 - `GET /api/catalog/services/active`: Listar todos los servicios activos (público) - Usado por clientes
 - `GET /api/catalog/services/active/category/{idCategoria}`: Listar servicios activos por categoría (público) - Usado por clientes
+- `GET /api/catalog/services/active/provider/{idProveedor}`: Listar servicios activos por proveedor (público) - Usado por clientes para ver servicios de un proveedor específico
 
 ### Notificaciones por Email
 - Cuando una categoría es desactivada por un administrador, se envía automáticamente un correo electrónico a todos los proveedores que pertenecen a esa categoría informándoles que sus servicios ya no estarán visibles para los clientes.

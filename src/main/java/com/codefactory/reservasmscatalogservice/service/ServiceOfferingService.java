@@ -15,4 +15,5 @@ public interface ServiceOfferingService {
     List<ServiceOfferingResponseDTO> getServicesByProvider(UUID idProveedor, UUID idProveedorFromJWT);
     List<ServiceOfferingResponseDTO> getActiveServicesByCategory(UUID idCategoria);
     List<ServiceOfferingResponseDTO> getAllActiveServices();
+    List<ServiceOfferingResponseDTO> getActiveServicesByProvider(UUID idProveedor);
 }

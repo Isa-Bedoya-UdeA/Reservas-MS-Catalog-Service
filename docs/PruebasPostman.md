@@ -837,7 +837,64 @@ Content-Type: application/json
 
 ---
 
-### 29. Listar Servicios Activos por Categoría Inactiva (404)
+### 30. Listar Servicios Activos por Proveedor (Público)
+
+**Nombre:** Get Active Services by Provider - Success
+**URL:** `http://localhost:8082/api/catalog/services/active/provider/[UUID-PROVEEDOR]`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+```
+**Código esperado:** 200 OK
+**Response esperado:**
+```json
+[
+    {
+        "id": "[UUID-SERVICIO-1]",
+        "nombreServicio": "Corte de Cabello",
+        "descripcion": "Corte de cabello profesional",
+        "duracionMinutos": 30,
+        "precio": 25000,
+        "capacidadMaxima": 1,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR]"
+    },
+    {
+        "id": "[UUID-SERVICIO-2]",
+        "nombreServicio": "Manicura",
+        "descripcion": "Manicura profesional",
+        "duracionMinutos": 45,
+        "precio": 20000,
+        "capacidadMaxima": 2,
+        "activo": true,
+        "idProveedor": "[UUID-PROVEEDOR]"
+    }
+]
+```
+**Nota:** Este endpoint retorna solo servicios activos del proveedor especificado. Útil para mostrar la página de un proveedor específico en el frontend.
+
+---
+
+### 31. Listar Servicios Activos por Proveedor Inexistente (200 - Lista Vacía)
+
+**Nombre:** Get Active Services by Provider - Not Found
+**URL:** `http://localhost:8082/api/catalog/services/active/provider/[UUID-PROVEEDOR-INEXISTENTE]`
+**Método:** GET
+**Headers:**
+```
+Content-Type: application/json
+```
+**Código esperado:** 200 OK
+**Response esperado:**
+```json
+[]
+```
+**Nota:** Si el proveedor no existe o no tiene servicios activos, el endpoint retorna una lista vacía en lugar de 404.
+
+---
+
+### 32. Listar Servicios Activos por Categoría Inactiva (404)
 
 **Nombre:** Get Active Services by Category - Inactive Category
 **URL:** `http://localhost:8082/api/catalog/services/active/category/[UUID-CATEGORIA-INACTIVA]`

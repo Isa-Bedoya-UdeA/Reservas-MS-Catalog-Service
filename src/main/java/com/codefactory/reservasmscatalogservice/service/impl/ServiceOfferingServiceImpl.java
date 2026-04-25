@@ -150,4 +150,13 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
                 .map(serviceOfferingMapper::toDto)
                 .toList();
     }
+
+    @Override
+    public List<ServiceOfferingResponseDTO> getActiveServicesByProvider(UUID idProveedor) {
+        // No validate provider existence for public endpoint
+        // If provider doesn't exist, repository will return empty list
+        return serviceOfferingRepository.findByIdProveedorAndActivoTrue(idProveedor).stream()
+                .map(serviceOfferingMapper::toDto)
+                .toList();
+    }
 }

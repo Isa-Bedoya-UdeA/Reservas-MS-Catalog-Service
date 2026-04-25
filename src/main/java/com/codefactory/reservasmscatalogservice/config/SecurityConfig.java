@@ -53,6 +53,7 @@ public class SecurityConfig {
                         // Service endpoints - GET públicos (clientes pueden ver servicios activos)
                         .requestMatchers(HttpMethod.GET, "/api/catalog/services/active").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/catalog/services/active/category/{idCategoria}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/catalog/services/active/provider/{idProveedor}").permitAll()
                         // Service endpoints de escritura - solo proveedores
                         .requestMatchers(HttpMethod.POST, "/api/catalog/services").hasRole("PROVEEDOR")
                         .requestMatchers(HttpMethod.PUT, "/api/catalog/services/{id}").hasRole("PROVEEDOR")

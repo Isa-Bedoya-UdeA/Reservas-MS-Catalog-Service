@@ -55,20 +55,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
                     // Extract authorities from JWT claims
                     String userRole = jwtService.extractClaim(jwt, claims -> claims.get("role", String.class));
-                    String userType = jwtService.extractClaim(jwt, claims -> claims.get("tipo_usuario", String.class));
+                    String userId = jwtService.extractClaim(jwt, claims -> claims.get("userId", String.class));
 
                     List<SimpleGrantedAuthority> authorities = Collections.emptyList();
                     if ("ADMIN".equals(userRole)) {
                         authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-                    } else if ("PROVEEDOR".equals(userType)) {
+                    } else if ("PROVEEDOR".equals(userRole)) {
                         authorities = List.of(new SimpleGrantedAuthority("ROLE_PROVEEDOR"));
-                    } else if ("CLIENTE".equals(userType)) {
+                    } else if ("CLIENTE".equals(userRole)) {
                         authorities = List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"));
                     }
 
+                    String principal = userId != null ? userId : userDetails.getUsername();
+
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails,
+                                    principal,
                                     null,
                                     authorities
                             );
