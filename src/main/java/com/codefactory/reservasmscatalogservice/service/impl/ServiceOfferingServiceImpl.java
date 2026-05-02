@@ -159,4 +159,11 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
                 .map(serviceOfferingMapper::toDto)
                 .toList();
     }
+
+    @Override
+    public ServiceOfferingResponseDTO getServiceById(UUID id) {
+        ServiceOffering service = serviceOfferingRepository.findById(id)
+                .orElseThrow(() -> new ServiceNotFoundException(id));
+        return serviceOfferingMapper.toDto(service);
+    }
 }

@@ -126,6 +126,20 @@ public class ServiceOfferingController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}")
+    @Operation(
+        summary = "Obtener servicio por ID",
+        description = "Retorna un servicio específico por su ID. Público para clientes."
+    )
+    @SecurityRequirements
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Servicio encontrado", content = @Content(schema = @Schema(implementation = ServiceOfferingResponseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Servicio no encontrado")
+    })
+    public ResponseEntity<ServiceOfferingResponseDTO> getServiceById(@PathVariable UUID id) {
+        return ResponseEntity.ok(serviceOfferingService.getServiceById(id));
+    }
+
     @GetMapping("/provider")
     @Operation(
         summary = "Listar servicios del proveedor",
