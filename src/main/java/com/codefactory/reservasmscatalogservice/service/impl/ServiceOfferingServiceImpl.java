@@ -32,13 +32,25 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
 
     @Override
     @Transactional
-    public ServiceOfferingResponseDTO createServiceOffering(CreateServiceOfferingRequestDTO request, UUID idProveedorFromJWT) {
+    public ServiceOfferingResponseDTO createServiceOffering(CreateServiceOfferingRequestDTO request,
+            UUID idProveedorFromJWT) {
         // Validate provider exists
         try {
-            authClient.getProviderById(idProveedorFromJWT);
+            var result = authClient.getProviderById(idProveedorFromJWT);
+            // log temporal
+            System.out.println("Provider found: " + result.getStatusCode() + " " + result.getBody());
         } catch (Exception e) {
+            System.out.println("Error calling auth: " + e.getClass().getName() + " - " + e.getMessage());
             throw new ServiceNotFoundException("Proveedor no encontrado con id: " + idProveedorFromJWT);
         }
+        /*
+         * ry {
+         * authClient.getProviderById(idProveedorFromJWT);
+         * } catch (Exception e) {
+         * throw new ServiceNotFoundException("Proveedor no encontrado con id: " +
+         * idProveedorFromJWT);
+         * }
+         */
 
         ServiceOffering serviceOffering = serviceOfferingMapper.toEntity(request);
         serviceOffering.setIdProveedor(idProveedorFromJWT);
@@ -49,7 +61,8 @@ public class ServiceOfferingServiceImpl implements ServiceOfferingService {
 
     @Override
     @Transactional
-    public ServiceOfferingResponseDTO updateServiceOffering(UUID id, UpdateServiceOfferingRequestDTO request, UUID idProveedorFromJWT) {
+    public ServiceOfferingResponseDTO updateServiceOffering(UUID id, UpdateServiceOfferingRequestDTO request,
+            UUID idProveedorFromJWT) {
         ServiceOffering service = serviceOfferingRepository.findById(id)
                 .orElseThrow(() -> new ServiceNotFoundException(id));
 
