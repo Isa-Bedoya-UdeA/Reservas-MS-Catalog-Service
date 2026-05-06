@@ -20,60 +20,67 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
-    private final JwtAccessDeniedHandler accessDeniedHandler;
-    private final CorsConfigurationSource corsConfigurationSource;
+        private final JwtAuthenticationFilter jwtAuthFilter;
+        private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+        private final JwtAccessDeniedHandler accessDeniedHandler;
+        private final CorsConfigurationSource corsConfigurationSource;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .authorizeHttpRequests(auth -> auth
-                        // Health check público
-                        .requestMatchers("/api/", "/api/version").permitAll()
-                        // Swagger/OpenAPI - Documentación pública
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/webjars/**").permitAll()
-                        .requestMatchers("/configuration/**").permitAll()
-                        // Category endpoints - GET públicos (cualquiera puede ver categorías activas)
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/categories/active").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/categories/{id}").permitAll()
-                        // Category endpoint - todas las categorías (incluyendo inactivas) solo para admins
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/categories").hasRole("ADMIN")
-                        // Category endpoints de escritura - solo admin
-                        .requestMatchers(HttpMethod.POST, "/api/catalog/categories").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/catalog/categories/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/catalog/categories/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/catalog/categories/{id}/activate").hasRole("ADMIN")
-                        // Service endpoints - GET públicos (clientes pueden ver servicios activos)
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/services/active").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/services/active/category/{idCategoria}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/services/active/provider/{idProveedor}").permitAll()
-                        // Service endpoints de escritura - solo proveedores
-                        .requestMatchers(HttpMethod.POST, "/api/catalog/services").hasRole("PROVEEDOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/catalog/services/{id}").hasRole("PROVEEDOR")
-                        .requestMatchers(HttpMethod.DELETE, "/api/catalog/services/{id}").hasRole("PROVEEDOR")
-                        .requestMatchers(HttpMethod.PATCH, "/api/catalog/services/{id}/disable").hasRole("PROVEEDOR")
-                        // Service endpoint - listar servicios del proveedor
-                        .requestMatchers(HttpMethod.GET, "/api/catalog/services/provider").hasRole("PROVEEDOR")
-                        // Service endpoint - eliminación permanente solo admin
-                        .requestMatchers(HttpMethod.DELETE, "/api/catalog/services/{id}/permanent").hasRole("ADMIN")
-                        // Todo lo demás requiere autenticación
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/api/", "/api/version").permitAll()
+                                                .requestMatchers("/swagger-ui.html").permitAll()
+                                                .requestMatchers("/swagger-ui/**").permitAll()
+                                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                                .requestMatchers("/swagger-resources/**").permitAll()
+                                                .requestMatchers("/webjars/**").permitAll()
+                                                .requestMatchers("/configuration/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/catalog/categories/active")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/catalog/categories/{id}")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/catalog/categories")
+                                                .hasAuthority("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/catalog/categories")
+                                                .hasAuthority("ADMIN")
+                                                .requestMatchers(HttpMethod.PUT, "/api/catalog/categories/{id}")
+                                                .hasAuthority("ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/catalog/categories/{id}")
+                                                .hasAuthority("ADMIN")
+                                                .requestMatchers(HttpMethod.PATCH,
+                                                                "/api/catalog/categories/{id}/activate")
+                                                .hasAuthority("ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/catalog/services/active")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/catalog/services/active/category/{idCategoria}")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/catalog/services/active/provider/{idProveedor}")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/catalog/services").hasAuthority("PROVEEDOR")
+                                                .requestMatchers(HttpMethod.PUT, "/api/catalog/services/{id}")
+                                                .hasAuthority("PROVEEDOR")
+                                                .requestMatchers(HttpMethod.DELETE, "/api/catalog/services/{id}")
+                                                .hasAuthority("PROVEEDOR")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/catalog/services/{id}/disable")
+                                                .hasAuthority("PROVEEDOR")
+                                                .requestMatchers(HttpMethod.GET, "/api/catalog/services/provider")
+                                                .hasAuthority("PROVEEDOR")
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                "/api/catalog/services/{id}/permanent")
+                                                .hasAuthority("ADMIN")
+                                                .anyRequest().authenticated())
+                                .exceptionHandling(e -> e
+                                                .authenticationEntryPoint(authenticationEntryPoint)
+                                                .accessDeniedHandler(accessDeniedHandler))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 }
