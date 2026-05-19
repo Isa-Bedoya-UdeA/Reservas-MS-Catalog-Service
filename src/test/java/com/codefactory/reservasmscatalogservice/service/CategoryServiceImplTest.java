@@ -276,7 +276,6 @@ class CategoryServiceImplTest {
     void deactivateCategory_CategoriaActiva_DesactivaYGuarda() {
         // Arrange
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(categoryEntity));
-        when(serviceOfferingRepository.findByActivoTrue()).thenReturn(List.of());
         when(categoryRepository.save(any())).thenReturn(categoryEntity);
 
         // Act
