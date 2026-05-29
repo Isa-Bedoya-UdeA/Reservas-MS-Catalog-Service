@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -15,6 +16,7 @@ import org.thymeleaf.context.Context;
 /**
  * Implementation of EmailService.
  * Sends category deactivation emails using JavaMailSender and Thymeleaf templates.
+ * Email sending is ASYNC to not block the main request thread.
  */
 @Service
 @ConditionalOnBean(name = "javaMailSender")
@@ -35,7 +37,9 @@ public class EmailServiceImpl implements EmailService {
     private String frontendUrl;
 
     @Override
+    @Async
     public void sendCategoryDeactivationEmail(String to, String nombreComercial, String nombreCategory) {
+        log.info("[ASYNC] Iniciando envio de email de desactivacion de categoria a: {}", to);
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -57,11 +61,11 @@ public class EmailServiceImpl implements EmailService {
 
             // Send email
             javaMailSender.send(message);
-            log.info("Category deactivation email sent successfully to: {}", to);
+            log.info("[ASYNC] Email de desactivacion de categoria enviado exitosamente a: {}", to);
 
         } catch (Exception e) {
-            log.error("Failed to send category deactivation email to: {}", to, e);
-            throw new RuntimeException("Failed to send category deactivation email: " + e.getMessage(), e);
+            log.error("[ASYNC] Error al enviar email de desactivacion de categoria a: {}", to, e);
+            // Don't throw - just log the error
         }
     }
 }
