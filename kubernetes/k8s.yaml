@@ -17,7 +17,7 @@ metadata:
   labels:
     app: catalog-service
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: catalog-service
