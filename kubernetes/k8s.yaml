@@ -32,6 +32,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: catalog-service-config
           env:
             - name: DB_USER
               valueFrom:
