@@ -1,0 +1,73 @@
+# ========================================
+# MS-CATALOG-SERVICE - Kubernetes Configuration
+# ========================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-service-config
+  namespace: default
+data:
+  SPRING_PROFILE: "prod"
+  SERVER_PORT: "8082"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-service
+  labels:
+    app: catalog-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: catalog-service
+  template:
+    metadata:
+      labels:
+        app: catalog-service
+    spec:
+      containers:
+        - name: catalog-service
+          image: reservas-ms-catalog-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8082
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-secrets
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-secrets
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-secrets
+                  key: JWT_SECRET
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-secrets
+                  key: DB_URL
+            - name: SERVICES_AUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: catalog-service-secrets
+                  key: SERVICES_AUTH_URL
+          # Probes disabled - actuator health is secured by Spring Security
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-service
+spec:
+  selector:
+    app: catalog-service
+  ports:
+    - port: 8082
+      targetPort: 8082
+  type: ClusterIP
