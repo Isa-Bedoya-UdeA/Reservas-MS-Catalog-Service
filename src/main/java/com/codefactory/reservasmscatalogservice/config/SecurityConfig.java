@@ -38,6 +38,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/swagger-resources/**").permitAll()
                                                 .requestMatchers("/webjars/**").permitAll()
                                                 .requestMatchers("/configuration/**").permitAll()
+                                                // Actuator endpoints para Prometheus (no exponer en prod)
+                                                .requestMatchers("/actuator/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/catalog/categories/active")
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/catalog/categories/{id}")
