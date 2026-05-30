@@ -28,8 +28,8 @@ spec:
     spec:
       containers:
         - name: catalog-service
-          image: reservas-ms-catalog-service:latest
-          imagePullPolicy: Never
+          image: isabedoya/reservas-ms-catalog-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           env:
