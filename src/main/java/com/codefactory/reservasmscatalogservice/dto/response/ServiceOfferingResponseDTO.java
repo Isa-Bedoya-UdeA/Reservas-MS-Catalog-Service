@@ -4,6 +4,7 @@ import com.codefactory.reservasmscatalogservice.dto.external.ExternalProviderDTO
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceOfferingResponseDTO extends RepresentationModel<ServiceOfferingResponseDTO> {
