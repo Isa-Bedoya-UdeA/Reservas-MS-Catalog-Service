@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -55,11 +57,12 @@ class CategoryControllerTest {
     void getAllCategories_ReturnsList() {
         when(categoryService.getAllCategories()).thenReturn(List.of(categoryResponse));
         
-        ResponseEntity<List<CategoryResponseDTO>> response = categoryController.getAllCategories();
+        ResponseEntity<CollectionModel<EntityModel<CategoryResponseDTO>>> response = categoryController.getAllCategories();
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).hasSize(1);
-        assertThat(response.getBody().get(0).getNombreCategoria()).isEqualTo("Belleza y Spa");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).hasSize(1);
+        assertThat(response.getBody().getContent().iterator().next().getContent().getNombreCategoria()).isEqualTo("Belleza y Spa");
     }
 
     @Test
@@ -67,10 +70,11 @@ class CategoryControllerTest {
     void getActiveCategories_ReturnsOnlyActive() {
         when(categoryService.getActiveCategories()).thenReturn(List.of(categoryResponse));
         
-        ResponseEntity<List<CategoryResponseDTO>> response = categoryController.getActiveCategories();
+        ResponseEntity<CollectionModel<EntityModel<CategoryResponseDTO>>> response = categoryController.getActiveCategories();
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).allMatch(CategoryResponseDTO::getActiva);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).allMatch(em -> em.getContent().isPresent() && em.getContent().get().getActiva());
     }
 
     @Test
@@ -78,11 +82,12 @@ class CategoryControllerTest {
     void getCategoryById_ReturnsCategory() {
         when(categoryService.getCategoryById(categoryId)).thenReturn(categoryResponse);
         
-        ResponseEntity<CategoryResponseDTO> response = categoryController.getCategoryById(categoryId);
+        ResponseEntity<EntityModel<CategoryResponseDTO>> response = categoryController.getCategoryById(categoryId);
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getIdCategoria()).isEqualTo(categoryId);
+        assertThat(response.getBody().getContent()).isPresent();
+        assertThat(response.getBody().getContent().get().getIdCategoria()).isEqualTo(categoryId);
     }
 
     @Test
@@ -95,7 +100,7 @@ class CategoryControllerTest {
         
         when(categoryService.createCategory(any())).thenReturn(categoryResponse);
         
-        ResponseEntity<CategoryResponseDTO> response = categoryController.createCategory(request);
+        ResponseEntity<EntityModel<CategoryResponseDTO>> response = categoryController.createCategory(request);
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
@@ -116,10 +121,12 @@ class CategoryControllerTest {
         
         when(categoryService.updateCategory(eq(categoryId), any())).thenReturn(updated);
         
-        ResponseEntity<CategoryResponseDTO> response = categoryController.updateCategory(categoryId, request);
+        ResponseEntity<EntityModel<CategoryResponseDTO>> response = categoryController.updateCategory(categoryId, request);
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getNombreCategoria()).isEqualTo("Actualizado");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).isPresent();
+        assertThat(response.getBody().getContent().get().getNombreCategoria()).isEqualTo("Actualizado");
     }
 
     @Test

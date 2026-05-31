@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -79,7 +81,7 @@ class ServiceOfferingControllerTest {
         when(serviceOfferingService.createServiceOffering(any(), eq(providerId)))
                 .thenReturn(serviceResponse);
 
-        ResponseEntity<ServiceOfferingResponseDTO> response = 
+        ResponseEntity<EntityModel<ServiceOfferingResponseDTO>> response = 
             serviceOfferingController.createServiceOffering(request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -107,11 +109,13 @@ class ServiceOfferingControllerTest {
         when(serviceOfferingService.updateServiceOffering(eq(serviceId), any(), eq(providerId)))
                 .thenReturn(updated);
 
-        ResponseEntity<ServiceOfferingResponseDTO> response = 
+        ResponseEntity<EntityModel<ServiceOfferingResponseDTO>> response = 
             serviceOfferingController.updateServiceOffering(serviceId, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getNombreServicio()).isEqualTo("Servicio Actualizado");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).isPresent();
+        assertThat(response.getBody().getContent().get().getNombreServicio()).isEqualTo("Servicio Actualizado");
     }
 
     @Test
@@ -119,7 +123,7 @@ class ServiceOfferingControllerTest {
     void getServiceById_ReturnsService() {
         when(serviceOfferingService.getServiceById(serviceId)).thenReturn(serviceResponse);
 
-        ResponseEntity<ServiceOfferingResponseDTO> response = 
+        ResponseEntity<EntityModel<ServiceOfferingResponseDTO>> response = 
             serviceOfferingController.getServiceById(serviceId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -131,11 +135,12 @@ class ServiceOfferingControllerTest {
     void getAllActiveServices_ReturnsList() {
         when(serviceOfferingService.getAllActiveServices()).thenReturn(List.of(serviceResponse));
 
-        ResponseEntity<List<ServiceOfferingResponseDTO>> response = 
+        ResponseEntity<CollectionModel<EntityModel<ServiceOfferingResponseDTO>>> response = 
             serviceOfferingController.getAllActiveServices();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).hasSize(1);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).hasSize(1);
     }
 
     @Test
@@ -167,10 +172,11 @@ class ServiceOfferingControllerTest {
         when(serviceOfferingService.getServicesByProvider(providerId, providerId))
                 .thenReturn(List.of(serviceResponse));
 
-        ResponseEntity<List<ServiceOfferingResponseDTO>> response = 
+        ResponseEntity<CollectionModel<EntityModel<ServiceOfferingResponseDTO>>> response = 
             serviceOfferingController.getServicesByProvider();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).hasSize(1);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).hasSize(1);
     }
 }
