@@ -14,12 +14,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/catalog/categories")
@@ -38,8 +43,14 @@ public class CategoryController {
         @ApiResponse(responseCode = "200", description = "Lista de categorías retornada exitosamente")
     })
     @SecurityRequirements
-    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    public ResponseEntity<CollectionModel<EntityModel<CategoryResponseDTO>>> getAllCategories() {
+        List<CategoryResponseDTO> categories = categoryService.getAllCategories();
+        List<EntityModel<CategoryResponseDTO>> models = categories.stream()
+            .map(c -> EntityModel.of(c,
+                linkTo(methodOn(CategoryController.class).getCategoryById(c.getIdCategoria())).withSelfRel()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(models,
+            linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()));
     }
 
     @GetMapping("/active")
@@ -51,8 +62,14 @@ public class CategoryController {
         @ApiResponse(responseCode = "200", description = "Lista de categorías activas retornada exitosamente")
     })
     @SecurityRequirements
-    public ResponseEntity<List<CategoryResponseDTO>> getActiveCategories() {
-        return ResponseEntity.ok(categoryService.getActiveCategories());
+    public ResponseEntity<CollectionModel<EntityModel<CategoryResponseDTO>>> getActiveCategories() {
+        List<CategoryResponseDTO> categories = categoryService.getActiveCategories();
+        List<EntityModel<CategoryResponseDTO>> models = categories.stream()
+            .map(c -> EntityModel.of(c,
+                linkTo(methodOn(CategoryController.class).getCategoryById(c.getIdCategoria())).withSelfRel()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(models,
+            linkTo(methodOn(CategoryController.class).getActiveCategories()).withSelfRel()));
     }
 
     @GetMapping("/{id}")
@@ -66,10 +83,15 @@ public class CategoryController {
         @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
     @SecurityRequirements
-    public ResponseEntity<CategoryResponseDTO> getCategoryById(
+    public ResponseEntity<EntityModel<CategoryResponseDTO>> getCategoryById(
         @Parameter(description = "UUID de la categoría", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
         @PathVariable UUID id) {
-        return ResponseEntity.ok(categoryService.getCategoryById(id));
+        CategoryResponseDTO category = categoryService.getCategoryById(id);
+        EntityModel<CategoryResponseDTO> entityModel = EntityModel.of(category,
+            linkTo(methodOn(CategoryController.class).getCategoryById(id)).withSelfRel(),
+            linkTo(methodOn(CategoryController.class).getActiveCategories()).withRel("active-categories"),
+            linkTo(methodOn(CategoryController.class).getAllCategories()).withRel("all-categories"));
+        return ResponseEntity.ok(entityModel);
     }
 
     @PostMapping
@@ -89,9 +111,13 @@ public class CategoryController {
         @ApiResponse(responseCode = "403", description = "No tiene rol de ADMIN"),
         @ApiResponse(responseCode = "409", description = "El nombre de la categoría ya existe")
     })
-    public ResponseEntity<CategoryResponseDTO> createCategory(
+    public ResponseEntity<EntityModel<CategoryResponseDTO>> createCategory(
             @Valid @RequestBody CreateCategoryRequestDTO request) {
-        return new ResponseEntity<>(categoryService.createCategory(request), HttpStatus.CREATED);
+        CategoryResponseDTO created = categoryService.createCategory(request);
+        EntityModel<CategoryResponseDTO> entityModel = EntityModel.of(created,
+            linkTo(methodOn(CategoryController.class).getCategoryById(created.getIdCategoria())).withSelfRel(),
+            linkTo(methodOn(CategoryController.class).getAllCategories()).withRel("all-categories"));
+        return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -111,11 +137,15 @@ public class CategoryController {
         @ApiResponse(responseCode = "403", description = "No tiene rol de ADMIN"),
         @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
-    public ResponseEntity<CategoryResponseDTO> updateCategory(
+    public ResponseEntity<EntityModel<CategoryResponseDTO>> updateCategory(
             @Parameter(description = "UUID de la categoría", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
             @PathVariable UUID id,
             @Valid @RequestBody UpdateCategoryRequestDTO request) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, request));
+        CategoryResponseDTO updated = categoryService.updateCategory(id, request);
+        EntityModel<CategoryResponseDTO> entityModel = EntityModel.of(updated,
+            linkTo(methodOn(CategoryController.class).getCategoryById(id)).withSelfRel(),
+            linkTo(methodOn(CategoryController.class).getAllCategories()).withRel("all-categories"));
+        return ResponseEntity.ok(entityModel);
     }
 
     @DeleteMapping("/{id}")

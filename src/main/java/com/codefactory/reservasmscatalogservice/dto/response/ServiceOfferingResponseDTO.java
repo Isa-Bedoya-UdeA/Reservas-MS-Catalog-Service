@@ -1,10 +1,11 @@
 package com.codefactory.reservasmscatalogservice.dto.response;
 
+import com.codefactory.reservasmscatalogservice.dto.external.ExternalProviderDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.codefactory.reservasmscatalogservice.dto.external.ExternalProviderDTO;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServiceOfferingResponseDTO {
+public class ServiceOfferingResponseDTO extends RepresentationModel<ServiceOfferingResponseDTO> {
     private UUID idServicio;
     private UUID idProveedor;
     private String nombreServicio;

@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/catalog/services")
@@ -41,13 +46,15 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "403", description = "No tiene rol de PROVEEDOR"),
         @ApiResponse(responseCode = "404", description = "Proveedor no encontrado")
     })
-    public ResponseEntity<ServiceOfferingResponseDTO> createServiceOffering(
+    public ResponseEntity<EntityModel<ServiceOfferingResponseDTO>> createServiceOffering(
             @Valid @RequestBody CreateServiceOfferingRequestDTO request) {
-        // Get userId from SecurityContext (set by JwtAuthenticationFilter)
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID idProveedor = UUID.fromString(userIdStr);
-        return new ResponseEntity<>(serviceOfferingService.createServiceOffering(request, idProveedor),
-                HttpStatus.CREATED);
+        ServiceOfferingResponseDTO created = serviceOfferingService.createServiceOffering(request, idProveedor);
+        EntityModel<ServiceOfferingResponseDTO> entityModel = EntityModel.of(created,
+            linkTo(methodOn(ServiceOfferingController.class).getServiceById(created.getIdServicio())).withSelfRel(),
+            linkTo(methodOn(ServiceOfferingController.class).getAllActiveServices()).withRel("active-services"));
+        return new ResponseEntity<>(entityModel, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -62,12 +69,16 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "403", description = "No es el creador del servicio"),
         @ApiResponse(responseCode = "404", description = "Servicio no encontrado")
     })
-    public ResponseEntity<ServiceOfferingResponseDTO> updateServiceOffering(
+    public ResponseEntity<EntityModel<ServiceOfferingResponseDTO>> updateServiceOffering(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateServiceOfferingRequestDTO request) {
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID idProveedor = UUID.fromString(userIdStr);
-        return ResponseEntity.ok(serviceOfferingService.updateServiceOffering(id, request, idProveedor));
+        ServiceOfferingResponseDTO updated = serviceOfferingService.updateServiceOffering(id, request, idProveedor);
+        EntityModel<ServiceOfferingResponseDTO> entityModel = EntityModel.of(updated,
+            linkTo(methodOn(ServiceOfferingController.class).getServiceById(id)).withSelfRel(),
+            linkTo(methodOn(ServiceOfferingController.class).getAllActiveServices()).withRel("active-services"));
+        return ResponseEntity.ok(entityModel);
     }
 
     @DeleteMapping("/{id}")
@@ -82,8 +93,7 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "404", description = "Servicio no encontrado"),
         @ApiResponse(responseCode = "409", description = "El servicio ya está inactivo")
     })
-    public ResponseEntity<Void> deleteServiceOffering(
-            @PathVariable UUID id) {
+    public ResponseEntity<Void> deleteServiceOffering(@PathVariable UUID id) {
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID idProveedor = UUID.fromString(userIdStr);
         serviceOfferingService.deleteServiceOffering(id, idProveedor);
@@ -102,8 +112,7 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "404", description = "Servicio no encontrado"),
         @ApiResponse(responseCode = "409", description = "El servicio ya está inactivo")
     })
-    public ResponseEntity<Void> disableServiceOffering(
-            @PathVariable UUID id) {
+    public ResponseEntity<Void> disableServiceOffering(@PathVariable UUID id) {
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID idProveedor = UUID.fromString(userIdStr);
         serviceOfferingService.deleteServiceOffering(id, idProveedor);
@@ -136,8 +145,13 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "200", description = "Servicio encontrado", content = @Content(schema = @Schema(implementation = ServiceOfferingResponseDTO.class))),
         @ApiResponse(responseCode = "404", description = "Servicio no encontrado")
     })
-    public ResponseEntity<ServiceOfferingResponseDTO> getServiceById(@PathVariable UUID id) {
-        return ResponseEntity.ok(serviceOfferingService.getServiceById(id));
+    public ResponseEntity<EntityModel<ServiceOfferingResponseDTO>> getServiceById(@PathVariable UUID id) {
+        ServiceOfferingResponseDTO service = serviceOfferingService.getServiceById(id);
+        EntityModel<ServiceOfferingResponseDTO> entityModel = EntityModel.of(service,
+            linkTo(methodOn(ServiceOfferingController.class).getServiceById(id)).withSelfRel(),
+            linkTo(methodOn(ServiceOfferingController.class).getAllActiveServices()).withRel("active-services"),
+            linkTo(methodOn(ServiceOfferingController.class).getActiveServicesByProvider(service.getIdProveedor())).withRel("provider-services"));
+        return ResponseEntity.ok(entityModel);
     }
 
     @GetMapping("/provider")
@@ -150,10 +164,16 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "401", description = "No autenticado"),
         @ApiResponse(responseCode = "403", description = "No tiene rol de PROVEEDOR")
     })
-    public ResponseEntity<List<ServiceOfferingResponseDTO>> getServicesByProvider() {
+    public ResponseEntity<CollectionModel<EntityModel<ServiceOfferingResponseDTO>>> getServicesByProvider() {
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
         UUID idProveedor = UUID.fromString(userIdStr);
-        return ResponseEntity.ok(serviceOfferingService.getServicesByProvider(idProveedor, idProveedor));
+        List<ServiceOfferingResponseDTO> services = serviceOfferingService.getServicesByProvider(idProveedor, idProveedor);
+        List<EntityModel<ServiceOfferingResponseDTO>> models = services.stream()
+            .map(s -> EntityModel.of(s,
+                linkTo(methodOn(ServiceOfferingController.class).getServiceById(s.getIdServicio())).withSelfRel()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(models,
+            linkTo(methodOn(ServiceOfferingController.class).getServicesByProvider()).withSelfRel()));
     }
 
     @GetMapping("/active")
@@ -165,8 +185,14 @@ public class ServiceOfferingController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de servicios activos retornada exitosamente")
     })
-    public ResponseEntity<List<ServiceOfferingResponseDTO>> getAllActiveServices() {
-        return ResponseEntity.ok(serviceOfferingService.getAllActiveServices());
+    public ResponseEntity<CollectionModel<EntityModel<ServiceOfferingResponseDTO>>> getAllActiveServices() {
+        List<ServiceOfferingResponseDTO> services = serviceOfferingService.getAllActiveServices();
+        List<EntityModel<ServiceOfferingResponseDTO>> models = services.stream()
+            .map(s -> EntityModel.of(s,
+                linkTo(methodOn(ServiceOfferingController.class).getServiceById(s.getIdServicio())).withSelfRel()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(models,
+            linkTo(methodOn(ServiceOfferingController.class).getAllActiveServices()).withSelfRel()));
     }
 
     @GetMapping("/active/category/{idCategoria}")
@@ -179,9 +205,15 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "200", description = "Lista de servicios activos retornada exitosamente"),
         @ApiResponse(responseCode = "404", description = "Categoría no encontrada o inactiva")
     })
-    public ResponseEntity<List<ServiceOfferingResponseDTO>> getActiveServicesByCategory(
+    public ResponseEntity<CollectionModel<EntityModel<ServiceOfferingResponseDTO>>> getActiveServicesByCategory(
             @PathVariable UUID idCategoria) {
-        return ResponseEntity.ok(serviceOfferingService.getActiveServicesByCategory(idCategoria));
+        List<ServiceOfferingResponseDTO> services = serviceOfferingService.getActiveServicesByCategory(idCategoria);
+        List<EntityModel<ServiceOfferingResponseDTO>> models = services.stream()
+            .map(s -> EntityModel.of(s,
+                linkTo(methodOn(ServiceOfferingController.class).getServiceById(s.getIdServicio())).withSelfRel()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(models,
+            linkTo(methodOn(ServiceOfferingController.class).getActiveServicesByCategory(idCategoria)).withSelfRel()));
     }
 
     @GetMapping("/active/provider/{idProveedor}")
@@ -194,8 +226,14 @@ public class ServiceOfferingController {
         @ApiResponse(responseCode = "200", description = "Lista de servicios activos retornada exitosamente"),
         @ApiResponse(responseCode = "404", description = "Proveedor no encontrado")
     })
-    public ResponseEntity<List<ServiceOfferingResponseDTO>> getActiveServicesByProvider(
+    public ResponseEntity<CollectionModel<EntityModel<ServiceOfferingResponseDTO>>> getActiveServicesByProvider(
             @PathVariable UUID idProveedor) {
-        return ResponseEntity.ok(serviceOfferingService.getActiveServicesByProvider(idProveedor));
+        List<ServiceOfferingResponseDTO> services = serviceOfferingService.getActiveServicesByProvider(idProveedor);
+        List<EntityModel<ServiceOfferingResponseDTO>> models = services.stream()
+            .map(s -> EntityModel.of(s,
+                linkTo(methodOn(ServiceOfferingController.class).getServiceById(s.getIdServicio())).withSelfRel()))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(CollectionModel.of(models,
+            linkTo(methodOn(ServiceOfferingController.class).getActiveServicesByProvider(idProveedor)).withSelfRel()));
     }
 }
