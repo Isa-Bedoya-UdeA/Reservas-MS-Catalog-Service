@@ -74,7 +74,7 @@ class CategoryControllerTest {
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getContent()).allMatch(em -> em.getContent().isPresent() && em.getContent().get().getActiva());
+        assertThat(response.getBody().getContent()).allMatch(em -> em.getContent().getActiva());
     }
 
     @Test
@@ -86,8 +86,8 @@ class CategoryControllerTest {
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getContent()).isPresent();
-        assertThat(response.getBody().getContent().get().getIdCategoria()).isEqualTo(categoryId);
+        assertThat(response.getBody().getContent()).isNotNull();
+        assertThat(response.getBody().getContent().getIdCategoria()).isEqualTo(categoryId);
     }
 
     @Test
@@ -125,8 +125,8 @@ class CategoryControllerTest {
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getContent()).isPresent();
-        assertThat(response.getBody().getContent().get().getNombreCategoria()).isEqualTo("Actualizado");
+        assertThat(response.getBody().getContent()).isNotNull();
+        assertThat(response.getBody().getContent().getNombreCategoria()).isEqualTo("Actualizado");
     }
 
     @Test

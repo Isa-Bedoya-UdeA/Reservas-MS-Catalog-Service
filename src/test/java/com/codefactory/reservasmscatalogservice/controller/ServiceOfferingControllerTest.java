@@ -114,8 +114,8 @@ class ServiceOfferingControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getContent()).isPresent();
-        assertThat(response.getBody().getContent().get().getNombreServicio()).isEqualTo("Servicio Actualizado");
+        assertThat(response.getBody().getContent()).isNotNull();
+        assertThat(response.getBody().getContent().getNombreServicio()).isEqualTo("Servicio Actualizado");
     }
 
     @Test
