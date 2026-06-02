@@ -36,7 +36,7 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: ""
 
-      - name: Validar Quality Gate de cobertura (>= 40%)
+      - name: Validar Quality Gate de cobertura (>= 50%)
         run: mvn verify --no-transfer-progress -DskipTests
         env:
           SPRING_PROFILES_ACTIVE: ""
